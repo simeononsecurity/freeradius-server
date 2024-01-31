@@ -60,8 +60,11 @@ $(OUTPUT)/%: $(DIR)/% | $(TEST).radiusd_kill $(TEST).radiusd_start
 	$(eval TARGET   := $(patsubst %.txt,%,$(notdir $@)$(E)))
 	${Q}if ! $(TEST_BIN)/radmin -q -f $(RADMIN_SOCKET_FILE) < $< > $(FOUND) 2>&1; then\
 		echo "--------------------------------------------------"; \
-		tail -n 20 "$(RADMIN_RADIUS_LOG)"; \
+		tail -n 2000 "$(RADMIN_RADIUS_LOG)" | egrep -v 'Worker '; \
 		echo "Last entries in server log ($(RADMIN_RADIUS_LOG)):"; \
+		echo "--------------------------------------------------"; \
+		egrep -i 'error|warning' "$(RADMIN_RADIUS_LOG)";           \
+		echo "Errors in server log ($(RADMIN_RADIUS_LOG)):";       \
 		echo "--------------------------------------------------"; \
 		echo "RADIUSD: $(RADIUSD_RUN)"; \
 		echo "RADMIN : $(TEST_BIN)/radmin -q -f $(RADMIN_SOCKET_FILE) < $< > $(FOUND)"; \
